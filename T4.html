@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蝦皮社群推廣券 - 自動轉換連結</title>
+    <style>
+        :root {
+            --shopee-orange: #f64d2d;
+            --bg-color: #f4f7f9;
+            --text-dark: #333333;
+            --text-muted: #888888;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* 手機端卡片容器 */
+        .phone-container {
+            max-width: 450px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        /* 橘色頂欄 */
+        .header {
+            background: linear-gradient(135deg, #ff6933, var(--shopee-orange));
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 20px;
+            margin: 0 0 6px 0;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        .header p {
+            font-size: 13px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* 內容區塊 */
+        .content {
+            padding: 20px 16px;
+        }
+
+        /* 貼上網址標題列（排版微調配合貼上按鈕） */
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+        
+        .title-badge {
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #4b5563;
+        }
+
+        .btn-paste {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-paste:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* 輸入框與輸出框 */
+        textarea {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background-color: #f9fafb;
+            padding: 14px;
+            font-size: 14px;
+            color: var(--text-dark);
+            resize: none;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.2s;
+        }
+        textarea:focus {
+            border-color: #ff8f66;
+        }
+        #productUrl {
+            height: 75px;
+        }
+        #resultUrl {
+            height: 90px;
+            background-color: #fafafa;
+        }
+
+        /* 轉換結果標題列 */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .shopping-cart-tip {
+            background-color: #fff1f2;
+            color: #f43f5e;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 按鈕區塊 */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            margin-bottom: 24px;
+        }
+        .btn-main {
+            flex: 1;
+            background-color: #fecdd3; /* 淺粉紅 */
+            color: #f43f5e;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-main.active {
+            background: linear-gradient(135deg, #ff6933, var(--shopee-orange));
+            color: white;
+        }
+        .btn-icon {
+            width: 50px;
+            background-color: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .btn-icon:hover { background-color: #f9fafb; }
+
+        /* 警告注意區塊 */
+        .warning-box {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: 16px;
+            padding: 16px;
+            color: var(--warning-text);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .warning-title {
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: #9a3412;
+        }
+        .highlight-red {
+            color: #e11d48;
+            font-weight: bold;
+        }
+        .sub-title-orange {
+            font-weight: bold;
+            color: #ea580c;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .step-list {
+            margin: 4px 0 0 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .step-num {
+            background-color: #fef08a;
+            color: #854d0e;
+            border-radius: 4px;
+            padding: 0 5px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* 頁尾版權 */
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+    <!-- 頂欄 -->
+    <div class="header">
+        <h1>🛍️ 蝦皮社群推廣券</h1>
+        <p>自動轉換連結</p>
+    </div>
+
+    <!-- 內容區 -->
+    <div class="content">
+        <!-- 貼上網址區 -->
+        <div class="input-header">
+            <div class="section-title">
+                <span class="title-badge">📋 貼上網址</span>
+            </div>
+            <button class="btn-paste" onclick="pasteFromClipboard()">📋 一鍵貼上</button>
+        </div>
+        <textarea id="productUrl" placeholder="https://tw.shp.ee/... 或 https://shopee.tw/..." oninput="checkInput()"></textarea>
+
+        <!-- 轉換結果區 -->
+        <div class="result-header">
+            <div class="section-title" style="margin: 0;">轉換結果</div>
+            <div class="shopping-cart-tip">💡 記得先打勾刪除</div>
+        </div>
+        <textarea id="resultUrl" readonly placeholder="等待輸入有效網址..."></textarea>
+
+        <!-- 操作按鈕 -->
+        <div class="action-group">
+            <button id="submitBtn" class="btn-main" onclick="generateLink()">
+                <span>↗️ 前往購買</span>
+            </button>
+            <button class="btn-icon" onclick="copyToClipboard()" title="複製連結">
+                📋
+            </button>
+        </div>
+
+        <!-- 注意事項卡片 -->
+        <div class="warning-box">
+            <div class="warning-title">📝 點擊連結前注意</div>
+            <div>請先到購物車把原本加入的同商品<span class="highlight-red">【打勾刪除】</span>，記得先刪除購物車內要用推廣券的商品，再用這個新連結重新加進去結帳，這樣才能順利幫大家買到最優惠的價格喔！</div>
+            
+            <div class="sub-title-orange">🔄 同商品下第二筆(含)以上</div>
+            <div style="margin-bottom: 2px;">每下完一筆請務必：</div>
+            <ul class="step-list">
+                <li class="step-item"><span class="step-num">1</span> <span>把蝦皮 APP 完整關閉</span></li>
+                <li class="step-item"><span class="step-num">2</span> <span>重新點擊連結下單</span></li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            本工具會自動轉換綠綠的推廣連結
+        </div>
+    </div>
+</div>
+
+<script>
+    // 寫死您的專屬聯盟 ID
+    const MY_AFFILIATE_ID = "16375640010";
+
+    // 監聽輸入狀態，改變按鈕顏色
+    function checkInput() {
+        const url = document.getElementById('productUrl').value.trim();
+        const submitBtn = document.getElementById('submitBtn');
+        if (url) {
+            submitBtn.classList.add('active');
+        } else {
+            submitBtn.classList.remove('active');
+        }
+    }
+
+    // 功能 1：一鍵貼上功能
+    function pasteFromClipboard() {
+        navigator.clipboard.readText()
+            .then(text => {
+                document.getElementById('productUrl').value = text.trim();
+                checkInput();
+            })
+            .catch(err => {
+                alert('無法讀取剪貼簿，請手動長按貼上。原因：' + err);
+            });
+    }
+
+    // 核心轉換邏輯
+    function generateLink() {
+        let productUrl = document.getElementById('productUrl').value.trim();
+        const resultTextArea = document.getElementById('resultUrl');
+
+        if (!productUrl) {
+            alert('請貼上蝦皮產品網址！');
+            return;
+        }
+
+        // 功能 2：判斷與攔截非蝦皮網址
+        // 嚴格檢查是否包含 shopee.tw、tw.shp.ee、s.shopee.tw
+        const isShopee = /shopee\.tw|tw\.shp\.ee/i.test(productUrl);
+        if (!isShopee) {
+            alert('❌ 錯誤：這不是有效的蝦皮網址，無法進行轉換！');
+            resultTextArea.value = "轉換失敗：請輸入正確的蝦皮網址。";
+            return;
+        }
+
+        // 判斷是否為短網址
+        const isShortUrl = productUrl.includes('tw.shp.ee') || productUrl.includes('s.shopee.tw');
+
+        if (!isShortUrl && productUrl.includes('?')) {
+            // 長網址才進行參數清洗
+            const parts = productUrl.split('?');
+            const baseUrl = parts[0];
+            const params = new URLSearchParams(parts[1]);
+            const extraParams = params.get('extraParams');
+            
+            if (extraParams) {
+                productUrl = `${baseUrl}?extraParams=${extraParams}`;
+            } else {
+                productUrl = baseUrl;
+            }
+        }
+
+        // 安全 URL 編碼
+        const encodedUrl = encodeURIComponent(productUrl);
+        
+        // 拼接蝦皮標準中轉格式
+        const baseUrl = "https://s.shopee.tw/an_redir?origin_link=";
+        const tailParams = `&affiliate_id=${MY_AFFILIATE_ID}&sub_id={clickid}`;
+        
+        const finalLink = baseUrl + encodedUrl + tailParams;
+        resultTextArea.value = finalLink;
+
+        // 自動複製並在 0.5 秒後跳轉
+        navigator.clipboard.writeText(finalLink).then(() => {
+            setTimeout(() => {
+                window.open(finalLink, '_blank');
+            }, 500);
+        });
+    }
+
+    // 獨立複製按鈕
+    function copyToClipboard() {
+        const resultTextArea = document.getElementById('resultUrl');
+        if (!resultTextArea.value || resultTextArea.value.startsWith('等待輸入') || resultTextArea.value.startsWith('轉換失敗')) {
+            alert('請先貼上正確網址並產生轉換結果！');
+            return;
+        }
+        navigator.clipboard.writeText(resultTextArea.value)
+            .then(() => alert('連結已成功複製！'))
+            .catch(err => alert('複製失敗，請手動複製'));
+    }
+</script>
+
+</body>
+</html>
